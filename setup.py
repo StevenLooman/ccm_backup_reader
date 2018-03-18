@@ -37,6 +37,7 @@ setup(
     version='0.0.1',
     description='IBM Synergy/CCM backup reader',
     long_description=LONG_DESCRIPTION,
+    url='https://github.com/StevenLooman/ccm_backup_reader/',
     author='Steven Looman',
     author_email='steven.looman@gmail.com',
     packages=['ccm_backup_reader'],
