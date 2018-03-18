@@ -3,6 +3,8 @@ ccm_backup_reader
 
 ccm_backup_reader is a tool to read IBM Synergy/CCM backups.
 
+At this moment, it (only) converts the backup of the database to a SQLite database.
+
 Currently it is only tested with backups from Synergy 7.2.1 (schema version ``0114``). If you're using another version, your milage may vary.
 
 Usage
