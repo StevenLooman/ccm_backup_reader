@@ -1,0 +1,10 @@
+*.pyc
+*.egg*
+.cache
+.pytest_cache
+.tox
+__pycache__
+build
+dist
+data
+DBdump.sqlite3*

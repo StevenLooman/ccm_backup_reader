@@ -1,0 +1,8 @@
+version 1.2.3
+platform WINDOWS_311
+schemaversion 1234
+Section START DEFAULT TEST_SECTION
+s:entry
+Section END
+table table_1
+tblend table_1 (0)
