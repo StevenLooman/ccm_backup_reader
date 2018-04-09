@@ -177,7 +177,7 @@ class TestText:
     def test_oa(self):
         with FixtureReader('test_text_oa') as reader:
             def read_table_record(event, record):
-                assert record == {'record': ["1"], 'table': {'name': 'table_1', 'record_count': 1}}
+                assert record == {'record': ["oa1"], 'table': {'name': 'table_1', 'record_count': 1}}
 
             parser = CcmBackupParser(reader)
             parser.set_callback('table_record', read_table_record)
@@ -187,7 +187,7 @@ class TestText:
     def test_ob(self):
         with FixtureReader('test_text_ob') as reader:
             def read_table_record(event, record):
-                assert record == {'record': ["2"], 'table': {'name': 'table_1', 'record_count': 1}}
+                assert record == {'record': ["ob2"], 'table': {'name': 'table_1', 'record_count': 1}}
 
             parser = CcmBackupParser(reader)
             parser.set_callback('table_record', read_table_record)
@@ -198,7 +198,7 @@ class TestText:
     def test_oj(self):
         with FixtureReader('test_text_oj') as reader:
             def read_table_record(event, record):
-                assert record == {'record': ["1234"], 'table': {'name': 'table_1', 'record_count': 1}}
+                assert record == {'record': ["oj1234"], 'table': {'name': 'table_1', 'record_count': 1}}
 
             parser = CcmBackupParser(reader)
             parser.set_callback('table_record', read_table_record)
@@ -208,7 +208,7 @@ class TestText:
     def test_ol(self):
         with FixtureReader('test_text_ol') as reader:
             def read_table_record(event, record):
-                assert record == {'record': ["0123456789abc0123456789"], 'table': {'name': 'table_1', 'record_count': 1}}
+                assert record == {'record': ["ol23,0123456789abc0123456789"], 'table': {'name': 'table_1', 'record_count': 1}}
 
             parser = CcmBackupParser(reader)
             parser.set_callback('table_record', read_table_record)
@@ -218,7 +218,7 @@ class TestText:
     def test_escape_1(self):
         with FixtureReader('test_text_escape_1') as reader:
             def read_table_record(event, record):
-                assert record == {'record': ["\ttab5678901234567890"], 'table': {'name': 'table_1', 'record_count': 1}}
+                assert record == {'record': ["ol20,\ttab5678901234567890"], 'table': {'name': 'table_1', 'record_count': 1}}
 
             parser = CcmBackupParser(reader)
             parser.set_callback('table_record', read_table_record)
@@ -228,7 +228,7 @@ class TestText:
     def test_escape_2(self):
         with FixtureReader('test_text_escape_2') as reader:
             def read_table_record(event, record):
-                assert record == {'record': ["…"], 'table': {'name': 'table_1', 'record_count': 1}}
+                assert record == {'record': ["ol1,…"], 'table': {'name': 'table_1', 'record_count': 1}}
 
             parser = CcmBackupParser(reader)
             parser.set_callback('table_record', read_table_record)
@@ -238,7 +238,7 @@ class TestText:
     def test_escape_3(self):
         with FixtureReader('test_text_escape_3') as reader:
             def read_table_record(event, record):
-                assert record == {'record': ["“"], 'table': {'name': 'table_1', 'record_count': 1}}
+                assert record == {'record': ["ol1,“"], 'table': {'name': 'table_1', 'record_count': 1}}
 
             parser = CcmBackupParser(reader)
             parser.set_callback('table_record', read_table_record)
@@ -248,7 +248,7 @@ class TestText:
     def test_escape_4(self):
         with FixtureReader('test_text_escape_4') as reader:
             def read_table_record(event, record):
-                assert record == {'record': ["ë"], 'table': {'name': 'table_1', 'record_count': 1}}
+                assert record == {'record': ["ol1,ë"], 'table': {'name': 'table_1', 'record_count': 1}}
 
             parser = CcmBackupParser(reader)
             parser.set_callback('table_record', read_table_record)

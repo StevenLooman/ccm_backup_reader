@@ -12,8 +12,8 @@ class PyTest(TestCommand):
         TestCommand.finalize_options(self)
         self.test_args = [
             '--strict',
-            '--verbose',
-            '--tb=long',
+            #'--verbose',
+            #'--tb=long',
             'tests']
         self.test_suite = True
 
@@ -29,6 +29,7 @@ with open(os.path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 
 REQUIRES=[
+    'parsimonious==0.8.0',
 ]
 
 
@@ -47,5 +48,6 @@ setup(
     scripts=[
         'scripts/ccm_backup_dumper.py',
         'scripts/ccm_backup_to_sqlite.py',
+        'scripts/ccm',
     ]
 )

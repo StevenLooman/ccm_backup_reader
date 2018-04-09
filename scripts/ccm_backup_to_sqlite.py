@@ -32,9 +32,8 @@ def main():
         sys.exit(1)
 
     def schemaversion(event, data):
-        c = conn.cursor()
         for statement in schema_creators[data]:
-            c.execute(statement)
+            cursor.execute(statement)
         conn.commit()
 
     def table_end(event, data):
@@ -45,9 +44,8 @@ def main():
         cursor.execute(statement, data['record'])
 
     conn = sqlite3.connect('DBdump.sqlite3')
+    cursor = conn.cursor()
     with FileInputLineReader() as reader:
-        cursor = conn.cursor()
-
         parser = CcmBackupParser(reader)
         parser.set_callback('schemaversion', schemaversion)
         parser.set_callback('table_end', table_end)

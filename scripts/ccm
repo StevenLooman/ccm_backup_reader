@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import argparse
+import os
+import os.path
+import sys
+
+from ccm_backup_reader import CcmDb
+from ccm_backup_reader.commands import CcmAttr
+from ccm_backup_reader.commands import CcmCat
+from ccm_backup_reader.commands import CcmCommandError
+from ccm_backup_reader.commands import CcmDelim
+from ccm_backup_reader.commands import CcmDiff
+from ccm_backup_reader.commands import CcmFinduse
+from ccm_backup_reader.commands import CcmQuery
+from ccm_backup_reader.commands import CcmStart
+from ccm_backup_reader.commands import CcmStop
+
+
+dispatcher = {
+    'attr': CcmAttr,
+    'cat': CcmCat,
+    'delim': CcmDelim,
+    'diff': CcmDiff,
+    'finduse': CcmFinduse,
+    'query': CcmQuery,
+    'start': CcmStart,
+    'stop': CcmStop,
+}
+
+arg_parser = argparse.ArgumentParser(description='ccm', epilog="Set CCM_BACKUP_PATH environment variable to extracted CCM backup path")
+arg_parser.add_argument('command', choices=dispatcher.keys())
+
+
+def main():
+    args, unknown = arg_parser.parse_known_args()
+
+    if "CCM_BACKUP_PATH" not in os.environ:
+        print("Set environment variable CCM_BACKUP_PATH to the backup path")
+
+    db_path = os.environ["CCM_BACKUP_PATH"]
+    db = CcmDb(db_path)
+
+    command_args = unknown
+
+    command_name = args.command
+    command = dispatcher[command_name](command_args, db)
+    command.run()
+
+
+
+if __name__ == '__main__':
+    main()

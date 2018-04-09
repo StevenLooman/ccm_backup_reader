@@ -1,10 +1,11 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import fileinput
 import os
 import re
 import sys
+
+import ccm_backup_reader.ccm_utils as ccm_utils
 
 
 # version
@@ -96,46 +97,9 @@ class CcmBackupParser(object):
     """
     """
 
-    UNESCAPE_TEXT_OL_TABLE = {
-        r"'(.)": lambda m: chr(ord(m.group(1)) - 0x20),
-        r'`(.)`(.)': lambda m: bytes([ord(m.group(1)) + 0x80, ord(m.group(2)) + 0x80]).decode('utf-8'),
-        r'`b"`"(.)': lambda m: bytes([0xe2, 0x80, ord(m.group(1)) + 0x20]).decode('utf-8'),
-        r'`b"``(.)': lambda m: bytes([0xe2, 0x80, ord(m.group(1)) + 0x80]).decode('utf-8'),
-    }
-
-    UNESCAPE_TEXT_TABLE = {
-        r'\\([ \*])': lambda m: chr(ord(m.group(1)) - 0x20),
-    }
-
     def __init__(self, reader):
         self._reader = reader
         self._callbacks = {}
-
-        exprs = [r for r in CcmBackupParser.UNESCAPE_TEXT_OL_TABLE.keys()]
-        self._unescape_text_ol_re = re.compile('|'.join(exprs))
-
-        exprs = [r for r in CcmBackupParser.UNESCAPE_TEXT_TABLE.keys()]
-        self._unescape_text_re = re.compile('|'.join(exprs))
-
-    def _unescape_text_ol(self, text):
-        def unescape_replace(match):
-            s = match.group(0)
-            for expr, func in CcmBackupParser.UNESCAPE_TEXT_OL_TABLE.items():
-                m = re.match(expr, s)
-                if m:
-                    return func(m)
-
-        return self._unescape_text_ol_re.sub(unescape_replace, text)
-
-    def _unescape_text(self, text):
-        def unescape_replace(match):
-            s = match.group(0)
-            for expr, func in CcmBackupParser.UNESCAPE_TEXT_TABLE.items():
-                m = re.match(expr, s)
-                if m:
-                    return func(m)
-
-        return self._unescape_text_re.sub(unescape_replace, text)
 
     def set_callback(self, event, callback):
         self._callbacks[event] = callback
@@ -168,14 +132,10 @@ class CcmBackupParser(object):
                     break
 
             # escaping, if needed
-            if text.startswith('oa') or text.startswith('ob') or text.startswith('oj'):
-                text = text[2:]
-            elif text.startswith('ol'):
-                ol_match = re.match('^ol(\d+),', text)
-                text = text[2 + len(ol_match.group(1)) + 1:]
-                text = self._unescape_text_ol(text)
+            if re.match('ol(\d)+,', text):
+                text = ccm_utils.unescape_text_ol(text)
             else:
-                text = self._unescape_text(text)
+                text = ccm_utils.unescape_text(text)
 
             # ensure ok, read te
             line = self._reader.readline()
