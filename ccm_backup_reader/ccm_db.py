@@ -77,11 +77,11 @@ where  compver.name = 'base' and
         # attributes from attrib-table
         query = \
 """
-select attrib.name, attrib.textval
-from   compver inner join attrib on (compver.id = attrib.is_attr_of)
-where  compver.name = ? and
-       compver.version = ? and
-       compver.cvtype = ? and
+SELECT attrib.name, attrib.textval
+FROM   compver INNER JOIN attrib ON (compver.id = attrib.is_attr_of)
+WHERE  compver.name = ? AND
+       compver.version = ? AND
+       compver.cvtype = ? AND
        compver.subsystem = ?;
 """
         args = (fpn['name'], fpn['version'], fpn['type'], fpn['instance'])
@@ -103,12 +103,12 @@ where  compver.name = ? and
         fpn = ccm_utils.parse_fpn(four_part_name, self.delim())
         query = \
 """
-select attrib.textval
-from   compver inner join attrib on (compver.id = attrib.is_attr_of)
-where  compver.name = ? and
-       compver.version = ? and
-       compver.cvtype = ? and
-       compver.subsystem = ? and
+SELECT attrib.textval
+FROM   compver INNER JOIN attrib ON (compver.id = attrib.is_attr_of)
+WHERE  compver.name = ? AND
+       compver.version = ? AND
+       compver.cvtype = ? AND
+       compver.subsystem = ? AND
        attrib.name = ?;
 """
         args = (fpn['name'], fpn['version'], fpn['type'], fpn['instance'], attr_name)
@@ -119,12 +119,12 @@ where  compver.name = ? and
             return ccm_utils.deserialize_textval(result[0])
 
         # attributes from compver-table
-        query = "select " + ", ".join(_COMPVER_ATTR_NAMES.keys()) + \
+        query = "SELECT " + ", ".join(_COMPVER_ATTR_NAMES.keys()) + \
 """
-from   compver
-where  compver.name = ? and
-       compver.version = ? and
-       compver.cvtype = ? and
+FROM   compver
+WHERE  compver.name = ? AND
+       compver.version = ? AND
+       compver.cvtype = ? AND
        compver.subsystem = ?;
 """
         args = (fpn['name'], fpn['version'], fpn['type'], fpn['instance'])
