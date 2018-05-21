@@ -138,6 +138,7 @@ WHERE  compver.name = ? AND
         return None
 
     def query(self, ccm_query):
+        """ Parse a CCM query and return resulting compvers """
         delim = self.delim()
         query_builder = SqlQueryBuilder(delim)
         sql_query = query_builder.build(ccm_query)
@@ -183,3 +184,9 @@ WHERE  compver.name = ? AND
         cursor = self._db_connection.cursor()
         cursor.execute(sql_query)
         return [row[0] for row in cursor.fetchall()]
+
+    def query_sql(self, sql_query, *args):
+        """ Execute a SQL query on table compver and return resulting compvers """
+        cursor = self._db_connection.cursor()
+        cursor.execute(sql_query, args)
+        return cursor.fetchall()

@@ -10,6 +10,15 @@ def parse_fpn(four_part_name, delim):
     fpn['version'], fpn['type'], fpn['instance'] = version_type_instance.split(':')
     return fpn
 
+def parse_full_name(full_name):
+    parts = full_name.split('/')
+    return {
+        'name': parts[2],
+        'version': parts[3],
+        'type': parts[1],
+        'instance': parts[0],
+    }
+
 
 UNESCAPE_TEXT_OL_TABLE = {
     r"'(.)": lambda m: chr(ord(m.group(1)) - 0x20),
