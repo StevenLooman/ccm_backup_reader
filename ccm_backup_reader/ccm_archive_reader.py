@@ -94,38 +94,48 @@ class CcmArchiveReader:
         self._metadata = ET.fromstring(metadata_text)
 
     def extract(self, version):
-        entry = self._find_top_entry()
-        data = self._extract_top_version()
+        # build entry-list to follow
+        entries = self._find_entries_to_entry(version)
+        entries.reverse()
 
-        while True:
-            full_name = entry['fullName']
-            if full_name == version:
-                return data
+        # read data from first entry
+        data = self._extract_version(entries[0])
+        entries = entries[1:]
 
-            entry, data = self._extract_predecessor(full_name, data)
+        # keep applying patches
+        for entry in entries:
+            data = self._apply_version(entry, data)
 
-    def _find_top_entry(self):
-        for entry in self._metadata.findall("entry"):
-            if entry.find('predecessor') is not None:
-                continue
+        return data
 
-            return self._entry_to_dict(entry)
+    def _find_entries_to_entry(self, version):
+        entry = self._find_entry(version)
+        entries = [entry]
+        while 'predecessor' in entry:
+            predecessor = entry['predecessor']
+            entry = self._find_entry(predecessor)
+            entries.append(entry)
+        return entries
+
+    def _extract_version(self, entry):
+        full_name = entry['fullName']
+        return self._zip_file.read(full_name)
+
+    def _apply_version(self, entry, data):
+        patch = self._extract_version(entry)
+
+        # apply patch
+        source_fd = BytesIO(data)
+        target_fd = BytesIO()
+        patch_fd = BytesIO(patch)
+        XDeltaApplier.apply(source_fd, target_fd, patch_fd)
+        target_fd.seek(0)
+        return target_fd.read()
 
     def _find_entry(self, full_name):
         for entry in self._metadata.findall("entry"):
             entry_full_name = entry.find('fullName').text
             if entry_full_name != full_name:
-                continue
-
-            return self._entry_to_dict(entry)
-
-    def _find_entry_with_predecessor(self, predecessor):
-        for entry in self._metadata.findall("entry"):
-            if entry.find('predecessor') is None:
-                continue
-
-            entry_predecessor = entry.find('predecessor').text
-            if entry_predecessor != predecessor:
                 continue
 
             return self._entry_to_dict(entry)
@@ -138,13 +148,28 @@ class CcmArchiveReader:
             d[key] = value
         return d
 
+    def _find_entry_with_predecessor(self, predecessor):
+        for entry in self._metadata.findall("entry"):
+            if entry.find('predecessor') is None:
+                continue
+
+            entry_predecessor = entry.find('predecessor').text
+            if entry_predecessor != predecessor:
+                continue
+
+            return self._entry_to_dict(entry)
+
+
+
+    def _find_top_entry(self):
+        last_entry = self._metadata.findall("entry")[-1]
+        return self._entry_to_dict(last_entry)
+
+
     def _extract_top_version(self):
         entry = self._find_top_entry()
         full_name = entry['fullName']
         return self._extract_version(full_name)
-
-    def _extract_version(self, full_name):
-        return self._zip_file.read(full_name)
 
     def _extract_predecessor(self, version, data):
         # get metadata
